@@ -171,7 +171,16 @@ impl PostLoginEnvironment {
 
                 client.arg(script_path);
 
-                Err(client.exec().into())
+                let mut child = client
+                    .spawn()
+                    .map_err(|e| EnvironmentStartError::ExecIo(e.to_string()))?;
+
+                match child.wait() {
+                    Ok(exit_code) => info!("Wayland session exited with `{exit_code}`"),
+                    Err(err) => error!("Failed to wait for Wayland session. Reason: {err}"),
+                }
+
+                process::exit(0);
             }
             PostLoginEnvironment::Shell => {
                 info!("Starting TTY shell");

@@ -444,7 +444,7 @@ fn start_session_child(
     }
 
     match status.code() {
-        Some(0) => Ok(()),
+        Some(0) | None => Ok(()),
         v => Err(StartSessionError::ChildIo(io::Error::other(format!(
             "unexpected exit code: {v:?}"
         )))),
